@@ -73,3 +73,4 @@ for i, gene in enumerate(solution):
 print(f"\nTotal weight: {int(np.sum(solution * weights))}")
 print(f"Total value:  {int(solution_fitness)}")
 
+# test
