@@ -28,6 +28,9 @@ def parse_input(file_path):
 
     return capacity, weights, values, item_names
 
+# Parse the input file
+capacity, weights, values, item_names = parse_input('./Input.csv')
+
 # Calculates the fitness of a solution
 # Returns total value if weight constraint is satisfied, otherwise 0
 def fitness_func(ga_instance, solution, solution_idx):
@@ -70,12 +73,3 @@ for i, gene in enumerate(solution):
 print(f"\nTotal weight: {int(np.sum(solution * weights))}")
 print(f"Total value:  {int(solution_fitness)}")
 
-import argparse
-
-# Set up command line argument parsing
-parser = argparse.ArgumentParser(description='Solve the 0/1 Knapsack Problem using a Genetic Algorithm')
-parser.add_argument('--input', type=str, required=True, help='Path to the input CSV file')
-args = parser.parse_args()
-
-# Parse the input file
-capacity, weights, values, item_names = parse_input(args.input)
