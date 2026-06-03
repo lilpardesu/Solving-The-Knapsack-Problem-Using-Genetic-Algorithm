@@ -43,19 +43,44 @@ def fitness_func(ga_instance, solution, solution_idx):
 
     return total_value
 
+# Tracks generations without improvement
+no_improvement_count = 0
+best_fitness_so_far = 0
+
+# Called after each generation to check for improvement
+def on_generation(ga_instance):
+    global no_improvement_count, best_fitness_so_far
+
+    current_best = ga_instance.best_solution()[1]
+
+    if current_best > best_fitness_so_far:
+        # Solution improved, reset counter
+        best_fitness_so_far = current_best
+        no_improvement_count = 0
+    else:
+        # No improvement, increment counter
+        no_improvement_count += 1
+        print(f"No improvement for {no_improvement_count} generations...")
+
+    # Stop if no improvement for 50 generations
+    if no_improvement_count >= 50:
+        print("Converged! Stopping early.")
+        return "stop"
+
 # Configure and initialize the Genetic Algorithm
 ga_instance = pygad.GA(
-    num_generations=100,       # Number of generations to evolve
-    num_parents_mating=5,      # Number of parents selected for mating
+    num_generations=1000,      # Maximum generations
+    num_parents_mating=20,
     fitness_func=fitness_func,
-    sol_per_pop=20,            # Population size
+    sol_per_pop=100,           # Larger population for complex problems
     num_genes=len(weights),    # One gene per item
     gene_type=int,
     gene_space=[0, 1],         # Binary: 1 = selected, 0 = not selected
     parent_selection_type="sss",
     crossover_type="single_point",
     mutation_type="random",
-    mutation_percent_genes=1   # Mutate 1% of genes per solution
+    mutation_percent_genes=5,
+    on_generation=on_generation  # Adaptive termination callback
 )
 
 # Run the Genetic Algorithm
@@ -73,4 +98,3 @@ for i, gene in enumerate(solution):
 print(f"\nTotal weight: {int(np.sum(solution * weights))}")
 print(f"Total value:  {int(solution_fitness)}")
 
-# test
