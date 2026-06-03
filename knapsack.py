@@ -42,3 +42,18 @@ def fitness_func(ga_instance, solution, solution_idx):
         return 0
 
     return total_value
+
+# Configure and initialize the Genetic Algorithm
+ga_instance = pygad.GA(
+    num_generations=100,       # Number of generations to evolve
+    num_parents_mating=5,      # Number of parents selected for mating
+    fitness_func=fitness_func,
+    sol_per_pop=20,            # Population size
+    num_genes=len(weights),    # One gene per item
+    gene_type=int,
+    gene_space=[0, 1],         # Binary: 1 = selected, 0 = not selected
+    parent_selection_type="sss",
+    crossover_type="single_point",
+    mutation_type="random",
+    mutation_percent_genes=1   # Mutate 1% of genes per solution
+)
