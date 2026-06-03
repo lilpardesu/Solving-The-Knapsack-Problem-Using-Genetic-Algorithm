@@ -31,21 +31,41 @@ def parse_input(file_path):
 # Parse the input file
 capacity, weights, values, item_names = parse_input('./Input.csv')
 
+# Scale GA parameters based on number of items
+num_items = len(weights)
+if num_items < 50:
+    sol_per_pop = 50
+    num_parents_mating = 10
+elif num_items < 200:
+    sol_per_pop = 100
+    num_parents_mating = 20
+else:
+    sol_per_pop = 200
+    num_parents_mating = 50
+
+# Penalty multiplier for overweight solutions
+PENALTY = 0.5
+
 # Calculates the fitness of a solution
-# Returns total value if weight constraint is satisfied, otherwise 0
+# Returns total value if weight constraint is satisfied, otherwise penalized value
 def fitness_func(ga_instance, solution, solution_idx):
     total_weight = np.sum(solution * weights)
     total_value = np.sum(solution * values)
 
     # Penalize solutions that exceed the knapsack capacity
     if total_weight > capacity:
-        return 0
+        return total_value - PENALTY * (total_weight - capacity)
 
     return total_value
+
 
 # Tracks generations without improvement
 no_improvement_count = 0
 best_fitness_so_far = 0
+
+# Mutation boundaries
+MIN_MUTATION = 1    # Minimum mutation rate
+MAX_MUTATION = 25   # Maximum mutation rate
 
 # Called after each generation to check for improvement
 def on_generation(ga_instance):
@@ -54,33 +74,45 @@ def on_generation(ga_instance):
     current_best = ga_instance.best_solution()[1]
 
     if current_best > best_fitness_so_far:
-        # Solution improved, reset counter
+        # Solution improved, reset counter and lower mutation
         best_fitness_so_far = current_best
         no_improvement_count = 0
-    else:
-        # No improvement, increment counter
-        no_improvement_count += 1
-        print(f"No improvement for {no_improvement_count} generations...")
+        ga_instance.mutation_percent_genes = max(
+            MIN_MUTATION,
+            ga_instance.mutation_percent_genes - 1  # Decrease mutation
+        )
+        print(f"Improved! Fitness: {current_best} | Mutation: {ga_instance.mutation_percent_genes}%")
 
-    # Stop if no improvement for 50 generations
+    else:
+        # No improvement, increment counter and raise mutation
+        no_improvement_count += 1
+        ga_instance.mutation_percent_genes = min(
+            MAX_MUTATION,
+            ga_instance.mutation_percent_genes + 1  # Increase mutation
+        )
+        print(f"No improvement for {no_improvement_count} generations | Mutation: {ga_instance.mutation_percent_genes}%")
+
+    # Stop if no improvement for 50 generations even at max mutation
     if no_improvement_count >= 50:
         print("Converged! Stopping early.")
         return "stop"
 
+
 # Configure and initialize the Genetic Algorithm
 ga_instance = pygad.GA(
     num_generations=1000,      # Maximum generations
-    num_parents_mating=20,
+    num_parents_mating=num_parents_mating,
     fitness_func=fitness_func,
-    sol_per_pop=100,           # Larger population for complex problems
+    sol_per_pop=sol_per_pop,
     num_genes=len(weights),    # One gene per item
     gene_type=int,
     gene_space=[0, 1],         # Binary: 1 = selected, 0 = not selected
-    parent_selection_type="sss",
+    parent_selection_type="tournament"
     crossover_type="single_point",
     mutation_type="random",
     mutation_percent_genes=5,
     on_generation=on_generation  # Adaptive termination callback
+    keep_elitism=5  # Keep top 5 solutions every generation
 )
 
 # Run the Genetic Algorithm
