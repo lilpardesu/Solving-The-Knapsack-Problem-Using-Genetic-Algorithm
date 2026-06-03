@@ -1,7 +1,7 @@
 import pygad
 import csv
 import numpy as np
-
+import argparse
 
 # Parses the input CSV file and returns the knapsack capacity,
 # item names, weights, and values
@@ -27,9 +27,6 @@ def parse_input(file_path):
                 values.append(int(row[2]))
 
     return capacity, weights, values, item_names
-
-# Parse the input file
-capacity, weights, values, item_names = parse_input('input.csv')
 
 # Calculates the fitness of a solution
 # Returns total value if weight constraint is satisfied, otherwise 0
@@ -57,3 +54,28 @@ ga_instance = pygad.GA(
     mutation_type="random",
     mutation_percent_genes=1   # Mutate 1% of genes per solution
 )
+
+# Run the Genetic Algorithm
+ga_instance.run()
+
+# Get the best solution found
+solution, solution_fitness, solution_idx = ga_instance.best_solution()
+
+# Print results
+print("Selected items:")
+for i, gene in enumerate(solution):
+    if gene == 1:
+        print(f"  - {item_names[i]} (weight: {weights[i]}, value: {values[i]})")
+
+print(f"\nTotal weight: {int(np.sum(solution * weights))}")
+print(f"Total value:  {int(solution_fitness)}")
+
+import argparse
+
+# Set up command line argument parsing
+parser = argparse.ArgumentParser(description='Solve the 0/1 Knapsack Problem using a Genetic Algorithm')
+parser.add_argument('--input', type=str, required=True, help='Path to the input CSV file')
+args = parser.parse_args()
+
+# Parse the input file
+capacity, weights, values, item_names = parse_input(args.input)
