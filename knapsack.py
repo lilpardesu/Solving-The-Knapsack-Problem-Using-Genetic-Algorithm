@@ -107,11 +107,11 @@ ga_instance = pygad.GA(
     num_genes=len(weights),    # One gene per item
     gene_type=int,
     gene_space=[0, 1],         # Binary: 1 = selected, 0 = not selected
-    parent_selection_type="tournament"
+    parent_selection_type="tournament",
     crossover_type="single_point",
     mutation_type="random",
     mutation_percent_genes=5,
-    on_generation=on_generation  # Adaptive termination callback
+    on_generation=on_generation,  # Adaptive termination callback
     keep_elitism=5  # Keep top 5 solutions every generation
 )
 
