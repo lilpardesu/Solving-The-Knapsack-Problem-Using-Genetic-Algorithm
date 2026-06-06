@@ -9,5 +9,9 @@ Select items with given weights and values to maximize total value without excee
 **Constraint:** Total weight ≤ Capacity  
 **Encoding:** Binary chromosome (1 = selected, 0 = not selected)
 
+## Group Members
+- Parya Parvan
+- Anahita Heidaripak
+
 
 
