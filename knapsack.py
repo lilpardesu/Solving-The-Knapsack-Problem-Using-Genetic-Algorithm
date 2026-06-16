@@ -44,7 +44,7 @@ else:
     num_parents_mating = 50
 
 # Penalty multiplier for overweight solutions
-PENALTY = 0.5
+PENALTY =  max(values) * 1.5
 
 # Calculates the fitness of a solution
 # Returns total value if weight constraint is satisfied, otherwise penalized value
